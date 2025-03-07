@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ActivTrak Productivity Opportunities Calculator</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        .input-group {
+            margin-bottom: 1rem;
+        }
+        .input-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.25rem;
+        }
+        .result-card {
+            background-color: #f0f9ff;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        .result-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+        .savings-value {
+            color: #047857;
+        }
+        @media print {
+            body {
+                print-color-adjust: exact;
+                -webkit-print-color-adjust: exact;
+            }
+            .no-print {
+                display: none;
+            }
+            .print-container {
+                max-width: 100%;
+                margin: 0;
+                padding: 0;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans">
+    <div class="container mx-auto py-8 px-4 print-container">
+        <header class="mb-8 text-center">
+            <h1 class="text-3xl font-bold text-gray-800 mb-2">ActivTrak Productivity Opportunities Calculator</h1>
+            <p class="text-gray-600 max-w-3xl mx-auto">Quantify the financial impact of productivity improvements across your organization</p>
+        </header>
+
+        <div class="bg-white rounded-lg shadow-lg overflow-hidden mb-8">
+            <div class="md:flex">
+                <!-- Input Section -->
+                <div class="md:w-1/2 p-6 bg-gray-50 border-r border-gray-200">
+                    <h2 class="text-xl font-semibold mb-4 text-gray-700">Input Parameters</h2>
+                    
+                    <div class="input-group">
+                        <label for="yearlySalary">Average Yearly Salary ($)</label>
+                        <input type="number" id="yearlySalary" value="60000" min="0">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="hoursPerYear">Hours Per Year</label>
+                        <input type="number" id="hoursPerYear" value="2080" min="0">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="licenses">Number of Licenses/Users</label>
+                        <input type="number" id="licenses" value="178" min="0">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="daysPerYear">Working Days Per Year</label>
+                        <input type="number" id="daysPerYear" value="260" min="0">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="productivityGoal">Productivity Goal (hours)</label>
+                        <input type="number" id="productivityGoal" value="7.5" min="0" step="0.1">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="productivityActual">Current Productivity (hours)</label>
+                        <input type="number" id="productivityActual" value="7" min="0" step="0.1">
+                    </div>
+                    
+                    <button id="calculateButton" class="mt-4 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full no-print">
+                        Calculate Savings
+                    </button>
+                </div>
+                
+                <!-- Results Section -->
+                <div class="md:w-1/2 p-6">
+                    <h2 class="text-xl font-semibold mb-4 text-gray-700">Calculation Results</h2>
+                    
+                    <div class="result-card">
+                        <h3 class="font-medium text-gray-700 mb-1">Average Hourly Rate</h3>
+                        <p id="hourlyRate" class="result-value">$28.85</p>
+                    </div>
+                    
+                    <div class="result-card">
+                        <h3 class="font-medium text-gray-700 mb-1">Productivity Gap (hours)</h3>
+                        <p id="productivityGap" class="result-value">0.5 hours</p>
+                    </div>
+                    
+                    <div class="result-card">
+                        <h3 class="font-medium text-gray-700 mb-1">Annual Savings Opportunity</h3>
+                        <p id="annualSavings" class="result-value savings-value">$667,500</p>
+                    </div>
+                    
+                    <div class="mt-8">
+                        <canvas id="savingsChart" height="200"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Additional Impact Analysis -->
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+            <h2 class="text-xl font-semibold mb-4 text-gray-700">Additional Impact Analysis</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-gray-50 p-4 rounded-lg shadow-sm border border-gray-200">
+                    <h3 class="font-medium text-gray-700 mb-2">Monthly Savings</h3>
+                    <p id="monthlySavings" class="text-2xl font-bold text-blue-600">$55,625</p>
+                </div>
+                
+                <div class="bg-gray-50 p-4 rounded-lg shadow-sm border border-gray-200">
+                    <h3 class="font-medium text-gray-700 mb-2">Per Employee Savings</h3>
+                    <p id="perEmployeeSavings" class="text-2xl font-bold text-blue-600">$3,750</p>
+                </div>
+                
+                <div class="bg-gray-50 p-4 rounded-lg shadow-sm border border-gray-200">
+                    <h3 class="font-medium text-gray-700 mb-2">Daily Savings</h3>
+                    <p id="dailySavings" class="text-2xl font-bold text-blue-600">$2,567</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Report Generation Section -->
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-8 no-print">
+            <h2 class="text-xl font-semibold mb-4 text-gray-700">Generate Report</h2>
+            <p class="mb-4 text-gray-600">Create a shareable report with your current calculations.</p>
+            
+            <div class="flex flex-wrap gap-4">
+                <button id="printButton" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                    <svg class="inline-block w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4"></path>
+                    </svg>
+                    Print Report
+                </button>
+            </div>
+        </div>
+        
+        <footer class="text-center text-gray-500 text-sm mt-8">
+            <p>© <span id="currentYear">2025</span> ActivTrak - Productivity Opportunities Calculator</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Set current year
+            document.getElementById("currentYear").textContent = new Date().getFullYear();
+            
+            // Get input elements
+            const yearlySalaryInput = document.getElementById("yearlySalary");
+            const hoursPerYearInput = document.getElementById("hoursPerYear");
+            const licensesInput = document.getElementById("licenses");
+            const daysPerYearInput = document.getElementById("daysPerYear");
+            const productivityGoalInput = document.getElementById("productivityGoal");
+            const productivityActualInput = document.getElementById("productivityActual");
+            
+            // Get output elements
+            const hourlyRateElement = document.getElementById("hourlyRate");
+            const productivityGapElement = document.getElementById("productivityGap");
+            const annualSavingsElement = document.getElementById("annualSavings");
+            const monthlySavingsElement = document.getElementById("monthlySavings");
+            const perEmployeeSavingsElement = document.getElementById("perEmployeeSavings");
+            const dailySavingsElement = document.getElementById("dailySavings");
+            
+            // Initialize chart
+            let savingsChart;
+            
+            // Format currency
+            function formatCurrency(value) {
+                return new Intl.NumberFormat('en-US', {
+                    style: 'currency',
+                    currency: 'USD',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                }).format(value);
+            }
+            
+            // Calculate function
+            function calculateSavings() {
+                // Get input values
+                const yearlySalary = parseFloat(yearlySalaryInput.value) || 0;
+                const hoursPerYear = parseFloat(hoursPerYearInput.value) || 0;
+                const licenses = parseFloat(licensesInput.value) || 0;
+                const daysPerYear = parseFloat(daysPerYearInput.value) || 0;
+                const productivityGoal = parseFloat(productivityGoalInput.value) || 0;
+                const productivityActual = parseFloat(productivityActualInput.value) || 0;
+                
+                // Calculate hourly rate
+                const hourlyRate = yearlySalary / hoursPerYear;
+                
+                // Calculate productivity gap
+                const productivityGap = productivityGoal - productivityActual;
+                
+                // Calculate savings
+                const annualSavings = hourlyRate * productivityGap * daysPerYear * licenses;
+                const monthlySavings = annualSavings / 12;
+                const perEmployeeSavings = annualSavings / licenses;
+                const dailySavings = annualSavings / daysPerYear;
+                
+                // Update UI
+                hourlyRateElement.textContent = new Intl.NumberFormat('en-US', {
+                    style: 'currency',
+                    currency: 'USD',
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                }).format(hourlyRate);
+                
+                productivityGapElement.textContent = productivityGap.toFixed(1) + " hours";
+                annualSavingsElement.textContent = formatCurrency(annualSavings);
+                monthlySavingsElement.textContent = formatCurrency(monthlySavings);
+                perEmployeeSavingsElement.textContent = formatCurrency(perEmployeeSavings);
+                dailySavingsElement.textContent = formatCurrency(dailySavings);
+                
+                // Update chart
+                updateChart(productivityActual, productivityGoal, annualSavings);
+            }
+            
+            // Initialize chart
+            function initChart() {
+                const ctx = document.getElementById('savingsChart').getContext('2d');
+                
+                savingsChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Current', 'Goal'],
+                        datasets: [
+                            {
+                                label: 'Productive Hours',
+                                data: [7, 7.5],
+                                backgroundColor: 'rgba(59, 130, 246, 0.7)',
+                                borderColor: 'rgba(59, 130, 246, 1)',
+                                borderWidth: 1,
+                                yAxisID: 'y'
+                            },
+                            {
+                                label: 'Potential Savings',
+                                data: [0, 667500],
+                                backgroundColor: 'rgba(16, 185, 129, 0.7)',
+                                borderColor: 'rgba(16, 185, 129, 1)',
+                                borderWidth: 1,
+                                yAxisID: 'y1'
+                            }
+                        ]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                type: 'linear',
+                                position: 'left',
+                                title: {
+                                    display: true,
+                                    text: 'Productive Hours'
+                                }
+                            },
+                            y1: {
+                                type: 'linear',
+                                position: 'right',
+                                title: {
+                                    display: true,
+                                    text: 'Potential Savings ($)'
+                                },
+                                grid: {
+                                    drawOnChartArea: false
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // Update chart
+            function updateChart(currentHours, goalHours, savings) {
+                savingsChart.data.datasets[0].data = [currentHours, goalHours];
+                savingsChart.data.datasets[1].data = [0, savings];
+                savingsChart.update();
+            }
+            
+            // Initialize chart
+            initChart();
+            
+            // Calculate savings on page load
+            calculateSavings();
+            
+            // Add event listeners
+            document.getElementById("calculateButton").addEventListener("click", calculateSavings);
+            
+            // Input change events
+            yearlySalaryInput.addEventListener("input", calculateSavings);
+            hoursPerYearInput.addEventListener("input", calculateSavings);
+            licensesInput.addEventListener("input", calculateSavings);
+            daysPerYearInput.addEventListener("input", calculateSavings);
+            productivityGoalInput.addEventListener("input", calculateSavings);
+            productivityActualInput.addEventListener("input", calculateSavings);
+            
+            // Print functionality
+            document.getElementById("printButton").addEventListener("click", function() {
+                window.print();
+            });
+        });
+    </script>
+</body>
+</html>
